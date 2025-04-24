@@ -3,11 +3,11 @@
 function [v] = agent_velocity(N, p, v, p_leader, v_leader, num_agents)
 
 % parameter definition
-k_c = 0.5;
-k_a = 0.5;
-k_s = 0.5;
-k_p = 0.5;
-k_v = 0.5;
+k_c = 0.1;
+k_a = 0.1;
+k_s = 0.1;
+k_p = 0.1;
+k_v = 0.1;
 r_0 = 0.1;
 k_avoid = 0.1;
 
@@ -18,12 +18,12 @@ F_separation = zeros(num_agents, 2);
 F_leader = zeros(num_agents, 2);
 
 for i = 1:num_agents
-    for j = 1:length(N(i))
-        if sum(N(i)) == 0
+    if sum(N(i)) == 0
         % no neighbors: only follow leader
         v(i, :) = k_p * (p_leader - p(i,:)) + k_v * (v_leader - v(i,:));
         continue;
-        end
+    end
+    for j = 1:length(N(i))
         if sum(N(i)) > 0 && N(i, j) ~= 0
             % cohesion force on each agent (i) from neighbors (j)
             F_cohesion(i, :) = F_cohesion(i, :) +k_c*(1/sum(N(i)) * p(j,:) - p(i,:));
