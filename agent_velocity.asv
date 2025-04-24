@@ -1,0 +1,68 @@
+%check github
+
+function [v] = agent_velocity(N, p, v, p_leader, v_leader, num_agents)
+
+% parameter definition
+k_c = 0.5;
+k_a = 0.5;
+k_s = 0.5;
+k_p = 0.5;
+k_v = 0.5;
+
+% preallocation
+F_cohesion = zeros(num_agents, 2);
+F_alignment = zeros(num_agents, 2);
+F_separation = zeros(num_agents, 2);
+F_leader = zeros(num_agents, 2);
+
+for i = 1:num_agents
+    for j = 1:length(N(i))
+        if sum(N(i)) > 0
+            % cohesion force on each agent (i) from neighbors (j)
+            F_cohesion(i) = k_c*(1/sum(N(i)) * sum(p(j) - p(i)));
+            
+            % alignment force on each agent (i) from neighbors (j)
+            F_alignment(i) = k_a * (1/sum(N(i)) * sum(v(j) - v(i)));
+            
+            % separation force on each agent (i) from neighbors (j)
+            F_separation(i) = k_s * (sum((p(i)-p(j))/abs(p(i)-p(j))^2));
+            
+            % force on each agent (i) from leader
+            F_leader(i) = k_p * (p_leader - p(i)) + k_v * (v_leader - v(i));
+            
+            % velocity on each agent (i)
+            v(i) = F_cohesion(i) + F_alignment(i) + F_separation(i) + F_leader(i);
+        end
+        if sum(N(i)) == 0
+            v(i) = 
+    end
+end
+% Parameters:
+
+% Cohesion:
+% k_c = cohesion force constant (int)
+% N = number of neighbors (mx)
+% p = agent position (mx)
+
+% Alignment 
+% k_a = alignment force constant (int)
+% N = number of neighbors (mx)
+% v = agent velocity (mx)
+
+% Separation: 
+% k_s = separation force constant (int)
+% p = agent position (mx)
+
+% Leader:
+% k_p = position following force constant (int)
+% k_v = velocity following force constant (int)
+% p_leader = leader position (vec)
+% v_leader = leader velocity (vec)
+% p = agent position (mx)
+% v = agent velocity (mx)
+
+% Forces:
+% F_cohesion = cohesion force (pull) (mx)
+% F_alignment = alignment force (pull) (mx)
+% F_separation = separation force (push) (mx)
+% F_leader = force relating agent to leader (pull) (mx)
