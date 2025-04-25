@@ -1,5 +1,5 @@
 function [N] = neighbor_calc(p, num_agents)
-    neighbor_distance = 3;
+    neighbor_distance = 6;
     N = zeros(num_agents);
     for i = 1:num_agents
         for j = 1:num_agents
