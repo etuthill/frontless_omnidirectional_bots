@@ -3,16 +3,16 @@
 function [v] = agent_velocity(N, p, v, p_leader, v_leader, num_agents)
 
 % parameter definition
-k_c = 0.1;     % cohesion
-k_a = 0.2;      % alignment
-k_s = 0.4;      % separation
+k_c = 0.05;     % cohesion
+k_a = 0.1;      % alignment
+k_s = 0.8;      % separation
 
 % Leader-following
 k_p = 0.05;     % attraction to leader position - reduce!
 k_v = 0.02;     % attraction to leader velocity - reduce!
 
 % Avoidance
-r_0 = 0.8;    
+r_0 = 0.9;    
 k_avoid = 0.8;   % makes repulsion significantly stronger
 
 % preallocation
