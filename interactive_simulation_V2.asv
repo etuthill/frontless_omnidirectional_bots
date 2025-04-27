@@ -6,7 +6,7 @@ function [] = interactive_simulation_V2()
     v_leader_current = [0, 0];         % leader starts still
 
     joy = vrjoystick(1);               % connect to joystick
-    drivetime = 50;                    % how long to run (seconds)
+    drivetime = 30;                    % how long to run (seconds)
     tic;
     collision_count = 0;               % keep track of crashes
 
