@@ -1,14 +1,31 @@
-function [] = interactive_simulation_V2()
-    num_agents = 10; 
-    p = rand(num_agents, 2) * 2 - 1;  % random start positions
+function [] = vector_simulation_drive()
+    num_agents = 2; 
+    p = [-5 -1; -5 1];
     v = zeros(num_agents, 2);         % start with zero velocity
-    p_leader_current = [1, 1];         % leader starts here
+    p_leader_current = [-4, 0];         % leader starts here
     v_leader_current = [0, 0];         % leader starts still
 
     joy = vrjoystick(1);               % connect to joystick
-    drivetime = 50;                    % how long to run (seconds)
+    drivetime = 8;                    % how long to run (seconds)
     tic;
     collision_count = 0;               % keep track of crashes
+
+    %-------------------------
+
+    max_records = 130;
+    leader_pos_store = zeros(max_records, 2);
+    leader_pos_store(1,:) = p_leader_current
+    leader_vel_store = zeros(max_records, 2);
+    leader_vel_store(1,:) = v_leader_current
+    %agent_pos_store = zeros(max_records, 2, 2);  % [time, agent, xy]
+    %agent_pos_store(1, 1,:) = p(1,:)
+    %agent_pos_store(1, 2,:) = p(2,:)
+    %agent_vel_store = zeros(max_records, 2, 2);
+    %agent_vel_store(1, 1,:) = p(1,:)
+    %agent_vel_store(1, 2,:) = p(2,:)
+    store_index = 1;
+    %-------------------------
+
 
     % set up the plot
     fig = figure('Name', 'interactive swarm simulation', 'NumberTitle', 'off');
@@ -29,7 +46,21 @@ function [] = interactive_simulation_V2()
         % calculate neighbors and update agent velocities
         N = neighbor_calc(p, num_agents);  
         v = agent_velocity(N, p, v, p_leader_current, v_leader_current, num_agents);  
-        p = position_update(p, v);  
+        p = position_update(p, v);
+
+        %--------------------
+        % Store leader's position and velocity
+        leader_pos_store(store_index, :) = p_leader_current;
+        leader_vel_store(store_index, :) = v_leader_current;
+
+        % Store each agent's position and velocity
+        for a = 1:2
+            agent_pos_store(store_index, a, :) = p(a, :);
+            agent_vel_store(store_index, a, :) = v(a, :);
+        end
+
+        store_index = store_index + 1;
+        %--------------------------------
 
         % redraw everything
         cla;
@@ -49,5 +80,5 @@ function [] = interactive_simulation_V2()
 
         pause(0.02);  % small delay so it runs smoothly
     end
+    save('pathdata.mat', 'leader_pos_store', 'leader_vel_store', 'agent_pos_store', 'agent_vel_store');
 end
-
