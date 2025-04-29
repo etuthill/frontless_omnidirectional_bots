@@ -1,12 +1,12 @@
 function [] = interactive_simulation_V2()
-    num_agents = 10; 
+    num_agents = 50; 
     p = rand(num_agents, 2) * 2 - 1;  % random start positions
     v = zeros(num_agents, 2);         % start with zero velocity
     p_leader_current = [1, 1];         % leader starts here
     v_leader_current = [0, 0];         % leader starts still
 
     joy = vrjoystick(1);               % connect to joystick
-    drivetime = 50;                    % how long to run (seconds)
+    drivetime = 30;                    % how long to run (seconds)
     tic;
     collision_count = 0;               % keep track of crashes
 
@@ -49,5 +49,6 @@ function [] = interactive_simulation_V2()
 
         pause(0.02);  % small delay so it runs smoothly
     end
+    disp(collision_count)
 end
 
