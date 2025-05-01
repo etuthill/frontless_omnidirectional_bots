@@ -1,0 +1,116 @@
+load('pathdata.mat');
+
+num_agents = 2;
+num_steps = length(x_pos);
+
+% Leader path
+x_pos = leader_pos_store(:,1)';
+y_pos = leader_pos_store(:,2)';
+x_vel = leader_vel_store(:,1)';
+y_vel = leader_vel_store(:,2)';
+
+% Initialize agent positions and velocities
+p = [-5, -1; -5, 1];  % Each row is an agent
+v = zeros(num_agents, 2);
+
+% Store agent trajectories
+agent_pos_history = cell(num_agents, 1);
+for i = 1:num_agents
+    agent_pos_history{i} = zeros(num_steps, 2);
+    agent_pos_history{i}(1, :) = p(i, :);
+end
+
+  k_c = 0.01;     % cohesion
+    k_a = 0.01;     % alignment
+    k_s = 1.0;      % separation
+    k_p = 0.05;     % attraction to leader position
+    k_v = 1.8;     % attraction to leader velocity
+    r_0 = 0.9;      % seperation influence radius
+    dt = 0.05;      % time step for velocity integration
+    v_max = 1.0; 
+% Grid for force field
+[x_grid, y_grid] = meshgrid(-5:0.5:5, -5:0.5:5);
+
+figure;
+
+for step = 1:num_steps
+    clf; % Clear figure each frame
+
+    % Update leader
+    p_leader_current = [x_pos(step), y_pos(step)];
+    v_leader_current = [x_vel(step), y_vel(step)];
+
+    % Swarm logic
+    N = neighbor_calc(p, num_agents);
+    v = agent_velocity(N, p, v, p_leader_current, v_leader_current, num_agents);
+    p = position_update(p, v);
+
+    % Update agent history
+    for i = 1:num_agents
+        agent_pos_history{i}(step, :) = p(i, :);
+    end
+
+    % Compute forces
+    u_sep = zeros(size(x_grid)); v_sep = zeros(size(y_grid));
+    u_coh = zeros(size(x_grid)); v_coh = zeros(size(y_grid));
+    u_align = zeros(size(x_grid)); v_align = zeros(size(y_grid));
+
+for ix = 1:size(x_grid, 1)
+    for iy = 1:size(y_grid, 2)
+        hypothetical_pos = [x_grid(ix, iy), y_grid(ix, iy)];
+        F_sep = zeros(1, 2);
+        F_coh = zeros(1, 2);
+        F_align = zeros(1, 2);
+
+        for i = 1:num_agents
+            r_vec = hypothetical_pos - p(i, :);
+            r = norm(r_vec);
+            if r ~= 0
+                % Separation from agents
+                F_sep = F_sep + k_s * (r_vec / r) * log(1 + r_0 / r);
+            end
+            % Cohesion toward agents
+            F_coh = F_coh + k_c * (p(i, :) - hypothetical_pos);
+
+            % Alignment with agents (relative to agent 1)
+            F_align = F_align + k_a * (v(i, :) - mean(v, 1));
+        end
+
+        % --- Store force components ---
+        u_sep(ix, iy) = F_sep(1);
+        v_sep(ix, iy) = F_sep(2);
+        u_coh(ix, iy) = F_coh(1);
+        v_coh(ix, iy) = F_coh(2);
+        u_align(ix, iy) = F_align(1);
+        v_align(ix, iy) = F_align(2);
+    end
+end
+
+
+    % Plot leader trajectory
+    plot(x_pos(1:step), y_pos(1:step), 'r.-', 'DisplayName', 'Leader Path'); 
+    hold on;
+
+    % Plot agent paths and current positions
+    for i = 1:num_agents
+        traj = agent_pos_history{i};
+        plot(traj(1:step, 1), traj(1:step, 2), '.-', 'DisplayName', sprintf('Agent %d Path', i));
+        plot(p(i, 1), p(i, 2), '.', 'DisplayName', sprintf('Agent %d', i), "Markersize", 20);
+    end
+
+    % Plot leader's current position
+    plot(p_leader_current(1), p_leader_current(2), 'k.', 'MarkerSize', 20, 'MarkerFaceColor', 'k', 'DisplayName', "Leader");
+
+    % Plot force vector fields
+    quiver(x_grid, y_grid, u_sep, v_sep, 'r', 'AutoScaleFactor', 0.8, 'DisplayName', "Separation");
+    quiver(x_grid, y_grid, u_coh, v_coh, 'b', 'AutoScaleFactor', 0.8, 'DisplayName', "Cohesion");
+    %quiver(x_grid, y_grid, u_align, v_align, 'g', 'AutoScaleFactor', 0.8, 'DisplayName', "Alignment");
+
+    xlabel('X Position (m)');
+    ylabel('Y Position (m)');
+    axis([-5, 5, -5, 5]);
+    title(['Swarm Simulation Step ' num2str(step)]);
+    legend('Location', 'northeastoutside');
+    drawnow;
+    pause(0.05); % Adjust for speed
+end
