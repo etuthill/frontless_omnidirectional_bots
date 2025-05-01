@@ -1,3 +1,4 @@
+
 function [] = long_driving_simulation()
     num_agents = 10; 
     p = rand(num_agents, 2) * 2 - 1;  % random start positions
@@ -6,7 +7,7 @@ function [] = long_driving_simulation()
     v_leader_current = [0, 0];         % leader starts still
 
     joy = vrjoystick(1);               % connect to joystick
-    drivetime = 50;                    % how long to run (seconds)
+    drivetime = 30;                    % how long to run (seconds)
     tic;
     collision_count = 0;               % keep track of crashes
 
@@ -49,5 +50,6 @@ function [] = long_driving_simulation()
 
         pause(0.02);  % small delay so it runs smoothly
     end
+    disp(collision_count)
 end
 
