@@ -14,9 +14,9 @@ function [] = vector_simulation_drive()
 
     max_records = 130;
     leader_pos_store = zeros(max_records, 2);
-    leader_pos_store(1,:) = p_leader_current
+    leader_pos_store(1,:) = p_leader_current;
     leader_vel_store = zeros(max_records, 2);
-    leader_vel_store(1,:) = v_leader_current
+    leader_vel_store(1,:) = v_leader_current;
     %agent_pos_store = zeros(max_records, 2, 2);  % [time, agent, xy]
     %agent_pos_store(1, 1,:) = p(1,:)
     %agent_pos_store(1, 2,:) = p(2,:)
