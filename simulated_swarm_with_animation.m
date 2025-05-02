@@ -1,5 +1,5 @@
 clear all; close all; clc;
-name = "Projection"
+name = "Tiny Sine"
 num_agents = 2;
 num_steps = 75;
 
@@ -14,14 +14,18 @@ num_steps = 75;
 
 
 t = linspace(0, 10*pi, num_steps);
-scale_factor = 0.3;
-x_pos = scale_factor * (sin(t) + 2*sin(2*t));
-y_pos = scale_factor * (cos(t) - 2*cos(2*t));
+scale_factor = 0.1;
+
+amplitude = 2;  % High amplitude value
+x_pos = scale_factor * t - 4;
+y_pos = scale_factor * amplitude * sin(t);
+
+
 x_vel = gradient(x_pos, t);
 y_vel = gradient(y_pos, t);
 
-p = [-2, -1;    % Agent 1
-     -2, 1];    % Agent 2
+p = [-4, -1;    % Agent 1
+     -4, 1];    % Agent 2
 v = zeros(num_agents, 2);
 
 % Store agent trajectories
@@ -150,7 +154,7 @@ end
     % Plot force vector fields
     quiver(x_grid, y_grid, u_sep, v_sep, 'r', 'AutoScaleFactor', 1, 'DisplayName', "Separation");
     quiver(x_grid, y_grid, u_coh, v_coh, 'b', 'AutoScaleFactor', 1, 'DisplayName', "Cohesion");
-    quiver(x_grid, y_grid, u_lead, v_lead, 'g', 'AutoScaleFactor', 1, 'DisplayName', "Leader");
+    quiver(x_grid, y_grid, u_lead, v_lead, 'g', 'AutoScaleFactor', 2, 'DisplayName', "Leader");
 
     % Formatting
     xlabel('X Position (m)');
