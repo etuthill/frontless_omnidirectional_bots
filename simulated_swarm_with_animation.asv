@@ -1,5 +1,5 @@
 clear all; close all; clc;
-name = "Tri Shape"
+name = "Projection"
 num_agents = 2;
 num_steps = 75;
 
@@ -80,17 +80,18 @@ for ix = 1:size(x_grid, 1)
             [~, nearest_agent] = min(vecnorm(p - pos, 2, 2));
             v_ref = v(nearest_agent,:);
             
-if r < r_0
-    follow_factor = (r / r_0)^2;
-    F_lead = follow_factor * k_p * r_vec;  % Remove velocity influence here
-else
-    F_lead = k_p * r_vec;  % Remove velocity influence here
-end
+            if r < r_0
+                follow_factor = (r/r_0)^2;
+                F_lead = follow_factor * (k_p*r_vec + k_v*(v_leader_current - v_ref));
+            else
+                F_lead = k_p*r_vec + k_v*(v_leader_current - v_ref);
+            end
+            
+            if r < r_0/2
+                separation_strength = k_s * (1/r - 2/r_0);
+                F_lead = F_lead - separation_strength * (r_vec/r);
+            end
 
-if r < r_0 / 2
-    separation_strength = k_s * (1 / r - 2 / r_0);
-    F_lead = F_lead - separation_strength * (r_vec / r);  % Separation still applies
-end
             u_lead(ix,iy) = F_lead(1);
             v_lead(ix,iy) = F_lead(2);
         else
@@ -147,9 +148,9 @@ end
     plot(p_leader_current(1), p_leader_current(2), 'k.', 'MarkerSize', 25, 'MarkerFaceColor', 'k', 'DisplayName', "Leader");
 
     % Plot force vector fields
-    quiver(x_grid, y_grid, u_sep, v_sep, 'r', 'AutoScaleFactor', 0.8, 'DisplayName', "Separation");
-    quiver(x_grid, y_grid, u_coh, v_coh, 'b', 'AutoScaleFactor', 0.8, 'DisplayName', "Cohesion");
-    quiver(x_grid, y_grid, u_lead, v_lead, 'k', 'AutoScaleFactor', 0.8, 'DisplayName', "Leader", "LineWidth", 2);
+    quiver(x_grid, y_grid, u_sep, v_sep, 'r', 'AutoScaleFactor', 1, 'DisplayName', "Separation");
+    quiver(x_grid, y_grid, u_coh, v_coh, 'b', 'AutoScaleFactor', 1, 'DisplayName', "Cohesion");
+    quiver(x_grid, y_grid, u_lead, v_lead, 'g', 'AutoScaleFactor', 1, 'DisplayName', "Leader");
 
     % Formatting
     xlabel('X Position (m)');
