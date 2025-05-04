@@ -1,19 +1,23 @@
-
 function [] = long_driving_simulation()
-    
+% LONG_DRIVING_SIMULATION - Runs an interactive joystick-controlled swarm simulation.
+%
+%   This function simulates a swarm of agents that follow a moving leader,
+%   whose position is controlled using a joystick. It uses cohesion, alignment,
+%   and separation behaviors to update agent velocities and positions. The
+%   simulation runs for a specified time and counts how many collisions occur
+%   between agents.
 
     num_agents = 50; 
 
-
     p = rand(num_agents, 2) * 2 - 1;  % random start positions
-    v = zeros(num_agents, 2);         % start with zero velocity
-    p_leader_current = [1, 1];         % leader starts here
-    v_leader_current = [0, 0];         % leader starts still
+    v = zeros(num_agents, 2);        % start with zero velocity
+    p_leader_current = [1, 1];       % leader starts here
+    v_leader_current = [0, 0];       % leader starts still
 
-    joy = vrjoystick(1);               % connect to joystick
-    drivetime = 20;                    % how long to run (seconds)
+    joy = vrjoystick(1);             % connect to joystick
+    drivetime = 40;                  % how long to run (seconds)
     tic;
-    collision_count = 0;               % keep track of crashes
+    collision_count = 0;             % keep track of crashes
 
     % set up the plot
     fig = figure('Name', 'interactive swarm simulation', 'NumberTitle', 'off');
@@ -51,9 +55,8 @@ function [] = long_driving_simulation()
             collision_count = collision_count + 1;
         end
 
-
         pause(0.02);  % small delay so it runs smoothly
     end
+
     disp(collision_count)
 end
-

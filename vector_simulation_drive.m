@@ -1,31 +1,30 @@
 function [] = vector_simulation_drive()
+% VECTOR_SIMULATION_DRIVE - Runs a simulation where agents follow a leader
+% based on joystick input and stores their trajectories.
+%
+%   This function simulates a group of agents (2 in this case) following a
+%   leader whose movement is controlled via a joystick. The positions and
+%   velocities of both the leader and the agents are updated in each iteration.
+%   The simulation runs for a specified amount of time, and the trajectories
+%   are stored in 'pathdata.mat'.
+
     num_agents = 2; 
-    p = [-5 -1; -5 1];
-    v = zeros(num_agents, 2);         % start with zero velocity
-    p_leader_current = [-4, 0];         % leader starts here
-    v_leader_current = [0, 0];         % leader starts still
+    p = [-5 -1; -5 1];  % initial agent positions
+    v = zeros(num_agents, 2);  % start with zero velocity
+    p_leader_current = [-4, 0];  % leader starts here
+    v_leader_current = [0, 0];  % leader starts still
 
-    joy = vrjoystick(1);               % connect to joystick
-    drivetime = 8;                    % how long to run (seconds)
+    joy = vrjoystick(1);  % connect to joystick
+    drivetime = 8;  % how long to run (seconds)
     tic;
-    collision_count = 0;               % keep track of crashes
+    collision_count = 0;  % keep track of crashes
 
-    %-------------------------
-
-    max_records = 130;
-    leader_pos_store = zeros(max_records, 2);
+    max_records = 130;  % maximum records for storing trajectory data
+    leader_pos_store = zeros(max_records, 2);  % store leader position
     leader_pos_store(1,:) = p_leader_current;
-    leader_vel_store = zeros(max_records, 2);
+    leader_vel_store = zeros(max_records, 2);  % store leader velocity
     leader_vel_store(1,:) = v_leader_current;
-    %agent_pos_store = zeros(max_records, 2, 2);  % [time, agent, xy]
-    %agent_pos_store(1, 1,:) = p(1,:)
-    %agent_pos_store(1, 2,:) = p(2,:)
-    %agent_vel_store = zeros(max_records, 2, 2);
-    %agent_vel_store(1, 1,:) = p(1,:)
-    %agent_vel_store(1, 2,:) = p(2,:)
     store_index = 1;
-    %-------------------------
-
 
     % set up the plot
     fig = figure('Name', 'interactive swarm simulation', 'NumberTitle', 'off');
@@ -39,7 +38,7 @@ function [] = vector_simulation_drive()
         dx = axes_vals(1);
         dy = -axes_vals(2); 
 
-        % update leader movement
+        % update leader movement based on joystick input
         v_leader_current = [dx, dy] * 0.06;  
         p_leader_current = p_leader_current + v_leader_current;
 
@@ -48,19 +47,17 @@ function [] = vector_simulation_drive()
         v = agent_velocity(N, p, v, p_leader_current, v_leader_current, num_agents);  
         p = position_update(p, v);
 
-        %--------------------
-        % Store leader's position and velocity
+        % store leader's position and velocity
         leader_pos_store(store_index, :) = p_leader_current;
         leader_vel_store(store_index, :) = v_leader_current;
 
-        % Store each agent's position and velocity
+        % store each agent's position and velocity
         for a = 1:2
             agent_pos_store(store_index, a, :) = p(a, :);
             agent_vel_store(store_index, a, :) = v(a, :);
         end
 
         store_index = store_index + 1;
-        %--------------------------------
 
         % redraw everything
         cla;
@@ -77,8 +74,9 @@ function [] = vector_simulation_drive()
             collision_count = collision_count + 1;
         end
 
-
         pause(0.02);  % small delay so it runs smoothly
     end
+
+    % save the collected data to a file
     save('pathdata.mat', 'leader_pos_store', 'leader_vel_store', 'agent_pos_store', 'agent_vel_store');
 end
